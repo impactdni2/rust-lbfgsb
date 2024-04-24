@@ -59,7 +59,7 @@ impl Default for LbfgsbParameter {
     fn default() -> Self {
         Self {
             m: 5,
-            factr: 1E7,
+            factr: 1E1,
             pgtol: 1E-5,
             iprint: -1,
         }
@@ -343,13 +343,19 @@ where
 /// # Return
 ///
 /// - Returns final state containing x, f(x), g(x).
-pub fn lbfgsb<E>(x: Vec<f64>, bounds: &[(f64, f64)], eval_fn: E) -> Result<LbfgsbState<E>>
+pub fn lbfgsb<E>(x: Vec<f64>, bounds: &[(f64, f64)], eval_fn: E, m: usize, factr: f64, pgtol: f64, iprint: i64) -> Result<LbfgsbState<E>>
 where
     E: FnMut(&[f64], &mut [f64]) -> Result<f64>,
 {
     assert_eq!(x.len(), bounds.len());
 
-    let param = LbfgsbParameter::default();
+    let param = LbfgsbParameter {
+      m,
+      factr,
+      pgtol,
+      iprint,
+    };
+  
     let mut problem = LbfgsbProblem::build(x, eval_fn);
     let bounds = bounds.into_iter().copied().map(|(l, u)| (Some(l), Some(u)));
     problem.set_bounds(bounds);
