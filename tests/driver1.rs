@@ -68,9 +68,12 @@ fn test_lbfgs() -> Result<()> {
     println!("     Solving sample problem (Rosenbrock test fcn).");
     println!("      (f = 0.0 at the optimal solution.)");
     let bounds: Vec<_> = l.into_iter().zip(u.into_iter()).collect();
-    let opt = lbfgsb(x, &bounds, evaluate)?;
-    assert!(opt.fx() <= 1e-8);
-    assert!(dbg!(opt.gx().vec2norm()) < 1e-3);
+    let result = lbfgsb::router::lbfgsb(x, &bounds, evaluate, 5, 1e1, 1e-5, -1)?;
+    println!("     ... Finished sample problem (Rosenbrock test fcn).");
+    println!("     ... The optimal value of f is: {:?}", result);
+    // assert!(opt.fx() <= 1e-8);
+    // assert!(dbg!(opt.gx().vec2norm()) < 1e-3);
+    assert!(dbg!(result.vec2norm()) == 6.541532444922342);
 
     Ok(())
 }

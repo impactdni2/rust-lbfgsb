@@ -1,6 +1,32 @@
 // [[file:../lbfgsb.note::*imports][imports:1]]
-use crate::*;
-use bindings::{FG, FG_END, NEW_X, START};
+
+#[allow(clippy::all)]
+mod bindings { include!(concat!(env!("OUT_DIR"), "/bindings_0.rs")); }
+use bindings::{integer, logical, FG, FG_END, NEW_X, START};
+
+extern "C" {
+    #[allow(clashing_extern_declarations)]
+    pub fn setulb(
+        n: *const integer,
+        m: *const integer,
+        x: *mut f64,
+        l: *const f64,
+        u: *const f64,
+        nbd: *const integer,
+        f: *mut f64,
+        g: *mut f64,
+        factr: *const f64,
+        pgtol: *const f64,
+        wa: *mut f64,
+        iwa: *mut integer,
+        task: *mut integer,
+        iprint: *const integer,
+        csave: *mut integer,
+        lsave: *mut logical,
+        isave: *mut integer,
+        dsave: *mut f64,
+    ) -> ::std::os::raw::c_int;
+}
 
 use anyhow::Result;
 // imports:1 ends here
@@ -275,7 +301,7 @@ where
         loop {
             unsafe {
                 #[allow(clashing_extern_declarations)]
-                crate::setulb(
+                setulb(
                     &(n as i64),             //x
                     &(m as i64),             //x
                     x.as_mut_ptr(),          //x
@@ -343,7 +369,7 @@ where
 /// # Return
 ///
 /// - Returns final state containing x, f(x), g(x).
-pub fn lbfgsb<E>(x: Vec<f64>, bounds: &[(f64, f64)], eval_fn: E, m: usize, factr: f64, pgtol: f64, iprint: i64) -> Result<LbfgsbState<E>>
+pub fn lbfgsb<E>(x: Vec<f64>, bounds: &[(f64, f64)], eval_fn: E, m: usize, factr: f64, pgtol: f64, iprint: i64) -> Result<Vec<f64>>
 where
     E: FnMut(&[f64], &mut [f64]) -> Result<f64>,
 {
@@ -363,6 +389,6 @@ where
     let mut state = LbfgsbState::new(problem, param);
     state.minimize()?;
 
-    Ok(state)
+    Ok(state.x().to_vec())
 }
 // pub:1 ends here
