@@ -104,7 +104,7 @@ where
 /// # Return
 ///
 /// - Returns final state containing x, f(x), g(x).
-pub fn lbfgsb<E>(problem: &mut LbfgsbProblem<E>, params: LbfgsbParameter) -> Result<()>
+pub fn lbfgsb<E>(problem: &mut LbfgsbProblem<E>, params: &LbfgsbParameter) -> Result<()>
 where
     E: FnMut(&[f64], &mut [f64]) -> Result<f64>,
 {
@@ -124,7 +124,7 @@ where
 {
     problem: &'a mut LbfgsbProblem<E>,
 
-    param: LbfgsbParameter,
+    param: &'a LbfgsbParameter,
 
     /// wa is a double precision working array of length:
     ///   (2mmax + 5)nmax + 12mmax^2 + 12mmax.
@@ -218,7 +218,7 @@ impl<'a, E> LbfgsbState<'a, E>
 where
     E: FnMut(&[f64], &mut [f64]) -> Result<f64>,
 {
-  fn new(problem: &'a mut LbfgsbProblem<E>, param: LbfgsbParameter) -> Self {
+  fn new(problem: &'a mut LbfgsbProblem<E>, param: &'a LbfgsbParameter) -> Self {
     let n = problem.x.len();
     let m = param.m;
     

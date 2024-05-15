@@ -19,7 +19,7 @@ struct LibTracker {
   pub in_use: [bool; MAX_INSTANCES],
 }
 
-pub fn lbfgsb<'a, E>(problem: &'a mut LbfgsbProblem<E>, param: LbfgsbParameter) -> Result<(), Error>
+pub fn lbfgsb<'a, E>(problem: &'a mut LbfgsbProblem<E>, param: &'a LbfgsbParameter) -> Result<(), Error>
 where E: FnMut(&[f64], &mut [f64]) -> Result<f64, Error> {
   // Find a library that isn't currently in use...
   let mut locked = libs_in_use.lock().unwrap();
@@ -117,6 +117,6 @@ where E: FnMut(&[f64], &mut [f64]) -> Result<f64, Error> {
 
   // Unlock that library
   libs_in_use.lock().unwrap().in_use[lib_id] = false;
-  
+
   result
 }

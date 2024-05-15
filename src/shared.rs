@@ -15,7 +15,7 @@ pub(crate) fn is_fg(task: i64) -> bool {
 pub struct LbfgsbParameter {
   /// On entry m is the maximum number of variable metric corrections allowed
   /// in the limited memory matrix.
-  pub(crate) m: usize,
+  pub m: usize,
 
   /// The tolerances in the stopping criteria for function value.
   ///
@@ -26,7 +26,7 @@ pub struct LbfgsbParameter {
   ///
   /// where epsmch is the machine precision, which is automatically generated
   /// by the code.
-  pub(crate) factr: f64,
+  pub factr: f64,
 
   /// The tolerances in the stopping criteria for gradient.
   ///
@@ -36,7 +36,7 @@ pub struct LbfgsbParameter {
   ///   max{|proj g_i | i = 1, ..., n} <= pgtol
   ///
   /// where pg_i is the ith component of the projected gradient.
-  pub(crate) pgtol: f64,
+  pub pgtol: f64,
 
   // iprint controls the frequency and type of output generated:
   //
@@ -49,7 +49,7 @@ pub struct LbfgsbParameter {
   //
   // When iprint > 0, the file iterate.dat will be created to summarize the
   // iteration.
-  pub(crate) iprint: i64,
+  pub iprint: i64,
 }
 
 impl Default for LbfgsbParameter {
@@ -69,13 +69,13 @@ pub struct LbfgsbProblem<E>
 where
   E: FnMut(&[f64], &mut [f64]) -> Result<f64>,
 {
-  pub(crate) x: Vec<f64>,
-  pub(crate) g: Vec<f64>,
-  pub(crate) f: f64,
-  pub(crate) l: Vec<f64>,
-  pub(crate) u: Vec<f64>,
-  pub(crate) nbd: Vec<i64>,
-  pub(crate) eval_fn: E,
+  pub x: Vec<f64>,
+  pub g: Vec<f64>,
+  pub f: f64,
+  pub l: Vec<f64>,
+  pub u: Vec<f64>,
+  pub nbd: Vec<i64>,
+  pub eval_fn: E,
 }
 
 impl<E> LbfgsbProblem<E>
@@ -92,6 +92,24 @@ where
       u: vec![0.0; n],
       nbd: vec![0; n],
       eval_fn,
+    }
+  }
+
+  pub fn reset(&mut self, len: usize) {
+    if len > self.x.len() {
+      self.x.resize(len, 0.0);
+      self.g.resize(len, 0.0);
+      self.l.resize(len, 0.0);
+      self.u.resize(len, 0.0);
+      self.nbd.resize(len, 0);
+    }
+    
+    for i in 0..len {
+      self.x[i] = 0.0;
+      self.g[i] = 0.0;
+      self.l[i] = 0.0;
+      self.u[i] = 0.0;
+      self.nbd[i] = 0;
     }
   }
 
